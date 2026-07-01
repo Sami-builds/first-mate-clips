@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>First Mate Clips</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <style>
+    body {font-family: Arial, sans-serif; margin: 20px;}
+    input, button {margin: 5px 0; padding: 5px;}
+    video {max-width: 100%; margin-top: 10px;}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/javascript">
+    const e = React.createElement;
+    function App() {
+      const [vodUrl, setVodUrl] = React.useState('');
+      const [start, setStart] = React.useState('');
+      const [end, setEnd] = React.useState('');
+      const [previewUrl, setPreviewUrl] = React.useState('');
+      const handleGenerate = async () => {
+        const resp = await fetch('/api/clip', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({vodUrl,start,end})
+        });
+        const data = await resp.json();
+        alert('Clip URL: ' + data.clipUrl);
+      };
+      const handleLoadPreview = () => {
+        setPreviewUrl(vodUrl);
+      };
+      return e('div', null,
+        e('h2','First Mate Clips MVP'),
+        e('div',null,
+          e('label',null,'Twitch VOD URL:'),
+          e('input',{type:'text',value:vodUrl,onChange:e=>setVodUrl(e.target.value)})
+        ),
+        e('div',null,
+          e('label',null,'Start (seconds):'),
+          e('input',{type:'number',value:start,onChange:e=>setStart(e.target.value)})
+        ),
+        e('div',null,
+          e('label',null,'End (seconds):'),
+          e('input',{type:'number',value:end,onChange:e=>setEnd(e.target.value)})
+        ),
+        e('button',{onClick:handleLoadPreview},'Load Preview'),
+        previewUrl && e('video',{src:previewUrl,controls:true,autoPlay:true}),
+        e('br'),
+        e('button',{onClick:handleGenerate},'Generate Clip')
+      );
+    }
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(e(App));
+  </script>
+</body>
+</html>
